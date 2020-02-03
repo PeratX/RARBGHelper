@@ -8,6 +8,10 @@ Supports:
 1. imagecurl
 1. imgcarry
 
+Requirements:
+
+1. Userscript Manager (like [Tampermonkey](https://www.tampermonkey.net/))
+
 ## License
 
     Copyright (C) 2020 PeratX

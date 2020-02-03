@@ -2,10 +2,13 @@
 // @name         Rarbg Image Helper
 // @namespace    https://peratx.net
 // @version      1.0.0
-// @description  22pixx
+// @description  View original image on Rarbg Torrent Page.
 // @author       PeratX
-// @match        https://rarbgprx.org/torrent/*
 // @license      Apache License 2.0
+// @match        https://rarbgprx.org/torrent/*
+// @supportURL   https://github.com/PeratX/RarbgImageHelper
+// @updateURL    https://raw.githubusercontent.com/PeratX/RarbgImageHelper/master/helper.js
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 (function () {
@@ -19,39 +22,57 @@
     }
 
     function setImage(a, img) {
-        console.log(img);
         a.setAttribute("href", img);
         a.getElementsByTagName("img")[0].setAttribute("src", img);
     }
 
-    let a = document.getElementById("description").getElementsByTagName("a")
+    let desc = document.getElementById("description");
+    desc.innerHTML = '<a href="https://github.com/PeratX/RarbgImageHelper">Rarbg Image Helper</a> Enabled</br>Made by <a href="mailto:peratx@itxtech.org">PeratX@iTXTech.org</a>   ' +
+        '<iframe src="https://ghbtns.com/github-btn.html?user=PeratX&repo=RarbgImageHelper&type=star&count=true" frameborder="0" scrolling="0" style="height: 20px;max-width: 120px;padding: 0 5px;box-sizing: border-box;margin-top: 5px;"></iframe></br></br></br>' + desc.innerHTML;
+    let a = desc.getElementsByTagName("a");
     for (let i in a) {
         if (typeof a[i] == "object") {
             let href = a[i].getAttribute("href");
             if (href.indexOf("22pixx") >= 0) {
-                fetch(href).then(body => body.text()).then(content => {
-                    let link = getStringBetween(content, "linkid=", '";');
-                    if (link !== false) {
-                        fetch(link).then(body => body.text()).then(body => {
-                            let img = getStringBetween(body, "<center><a href=", '" ');
-                            setImage(a[i], img);
-                        });
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: href,
+                    onload: function (response) {
+                        let link = getStringBetween(response.responseText, "linkid=", '";');
+                        if (link !== false) {
+                            GM_xmlhttpRequest({
+                                method: "GET",
+                                url: link,
+                                onload: function (response) {
+                                    let img = getStringBetween(response.responseText, "<center><a href=", '" ');
+                                    setImage(a[i], img);
+                                }
+                            });
+                        }
                     }
                 })
             } else if (href.indexOf("imgcarry") >= 0) {
-                fetch(href).then(body => body.text()).then(content => {
-                    let img = getStringBetween(content, "<span id=imagecode ><img src=", '" ');
-                    if (img !== false) {
-                        setImage(a[i], img);
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: href,
+                    onload: function (response) {
+                        let img = getStringBetween(response.responseText, "<span id=imagecode ><img src=", '" ');
+                        if (img !== false) {
+                            setImage(a[i], img);
+                        }
                     }
-                })
+                });
             } else if (href.indexOf("imagecurl") >= 0) {
-                fetch(href).then(body => body.text()).then(content => {
-                    let img = getStringBetween(content, ".html('<br/><a href=", '">');
-                    if (img !== false) {
-                        setImage(a[i], img);
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: href,
+                    onload: function (response) {
+                        let img = getStringBetween(response.responseText, ".html('<br/><a href=", '">');
+                        if (img !== false) {
+                            setImage(a[i], img);
+                        }
                     }
-                })
+                });
             }
         }
     }
