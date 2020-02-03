@@ -16,6 +16,7 @@
     function getStringBetween(str, begin, end) {
         if (str.indexOf(begin) >= 0) {
             let index = str.indexOf(begin);
+            console.log(str.substring(index + begin.length + 1, str.indexOf(end, index)));
             return str.substring(index + begin.length + 1, str.indexOf(end, index));
         }
         return false;
@@ -51,23 +52,17 @@
                         }
                     }
                 })
-            } else if (href.indexOf("imgcarry") >= 0) {
+            } else {
                 GM_xmlhttpRequest({
                     method: "GET",
                     url: href,
                     onload: function (response) {
-                        let img = getStringBetween(response.responseText, "<span id=imagecode ><img src=", '" ');
-                        if (img !== false) {
-                            setImage(a[i], img);
-                        }
-                    }
-                });
-            } else if (href.indexOf("imagecurl") >= 0) {
-                GM_xmlhttpRequest({
-                    method: "GET",
-                    url: href,
-                    onload: function (response) {
+                        // imagecurl
                         let img = getStringBetween(response.responseText, ".html('<br/><a href=", '">');
+                        if (img === false) {
+                            // other sites like imagefruit
+                            img = getStringBetween(response.responseText, "<span id=imagecode ><img src=", '" ');
+                        }
                         if (img !== false) {
                             setImage(a[i], img);
                         }

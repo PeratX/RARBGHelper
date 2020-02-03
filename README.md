@@ -6,11 +6,18 @@ Supports:
 
 1. 22pixx
 1. imagecurl
+1. imagefruit
+1. imgshots
 1. imgcarry
+1. freebunker
+1. imagesnake
+1. xxxxbus
+1. and more
 
 Requirements:
 
-1. Userscript Manager (like [Tampermonkey](https://www.tampermonkey.net/))
+1. Userscript Manager ([Tampermonkey](https://www.tampermonkey.net/))
+1. Allow CORS
 
 ## License
 
