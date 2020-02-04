@@ -1,15 +1,15 @@
-# RARBG Helper
+# RARBG 助手
 
-Powerful Toolbox for [RARBG](https://rarbgprx.org).
+为 [RARBG](https://rarbgprx.org) 定制的强力工具箱。
 
-Install via [GreasyFork](https://greasyfork.org/en/scripts/396019-rarbg-helper)
+通过 [GreasyFork](https://greasyfork.org/zh-CN/scripts/396019-rarbg-helper) 安装
 
-## Features
+## 特性
 
- * Drag mouse over page link, the script will load rating and download link below the link.
- * View original image on RARBG Torrent Page without open external sites.
+ * 预览大图的同时将为您加载评分和下载链接
+ * 直接在详情页查看原图，无需打开外部网站
 
-### Supported Image Sites:
+### 支持的图站:
 
 1. 22pixx
 1. imgprime
@@ -20,18 +20,18 @@ Install via [GreasyFork](https://greasyfork.org/en/scripts/396019-rarbg-helper)
 1. freebunker
 1. imagesnake
 1. xxxxbus
-1. and more
+1. 还有更多！
 
-## Requirements:
+## 环境要求:
 
-1. Userscript Manager ([Tampermonkey](https://www.tampermonkey.net/))
-1. Allow CORS
+1. 用户脚本管理器 ([Tampermonkey](https://www.tampermonkey.net/))
+1. 允许跨域请求
 
-## Acknowledgments:
+## 鸣谢:
 
  * [RARBG 大预览图](https://greasyfork.org/zh-CN/scripts/381736-rarbg-%E5%A4%A7%E9%A2%84%E8%A7%88%E5%9B%BE)
 
-## License
+## 开源许可
 
     Copyright (C) 2020 PeratX
     
