@@ -2,7 +2,7 @@
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
-// @version               1.1.0
+// @version               1.1.1
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
@@ -73,11 +73,11 @@
             pop.style.left = xoff + "px"
         };
 
-        let a = document.querySelectorAll('tr[class="lista2"] > td:nth-child(2) >a:nth-child(1)')
-        for (let i = 0; i < a.length; i++) {
-            a[i].parentNode.innerHTML += '<br><a href="https://github.com/PeratX/RARBGHelper" target="_blank"><img src="https://github.githubassets.com/favicon.ico" border="0" style="width: 12px;"></a><span>     </span>'
+        let td = document.querySelectorAll('tr[class="lista2"] > td:nth-child(2)')
+        for (let i = 0; i < td.length; i++) {
+            td[i].innerHTML += '<br><a href="https://github.com/PeratX/RARBGHelper" target="_blank"><img src="https://github.githubassets.com/favicon.ico" border="0" style="width: 12px;"></a><span>     </span>'
         }
-        a = document.querySelectorAll('tr[class="lista2"] > td:nth-child(2) >a:nth-child(1)')
+        let a = document.querySelectorAll('tr[class="lista2"] > td:nth-child(2) >a:nth-child(1)')
         for (let i = 0; i < a.length; i++) {
             let ev = a[i].attributes.onmouseover
             if (ev === false) {
