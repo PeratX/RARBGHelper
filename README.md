@@ -9,7 +9,7 @@ Install via [GreasyFork](https://greasyfork.org/en/scripts/396019-rarbg-helper)
  * Drag mouse over page link, the script will load rating and download link below the link.
  * View original image on RARBG Torrent Page without open external sites.
 
-### Supported Image Sites:
+### Supported Image Sites
 
 1. 22pixx
 1. imgprime
@@ -22,12 +22,12 @@ Install via [GreasyFork](https://greasyfork.org/en/scripts/396019-rarbg-helper)
 1. xxxxbus
 1. and more
 
-## Requirements:
+## Requirements
 
 1. Userscript Manager ([Tampermonkey](https://www.tampermonkey.net/))
 1. Allow CORS
 
-## Acknowledgments:
+## Acknowledgments
 
  * [RARBG 大预览图](https://greasyfork.org/zh-CN/scripts/381736-rarbg-%E5%A4%A7%E9%A2%84%E8%A7%88%E5%9B%BE)
 

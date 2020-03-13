@@ -2,7 +2,7 @@
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
-// @version               1.1.1
+// @version               1.2.0
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
@@ -122,8 +122,9 @@
                     url: a[i].getAttribute("href"),
                     onload: function (response) {
                         // 22pixx, imgprime
-                        let img = getStringBetween(response.responseText, "linkid=", '";');
+                        let img = getStringBetween(response.responseText, "<div id='continuetoimage'>", '\" target=');
                         if (img !== false) {
+                            img = img.trim().replace("<a href=\"", "");
                             GM_xmlhttpRequest({
                                 method: "GET",
                                 url: img,
