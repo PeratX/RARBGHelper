@@ -2,7 +2,7 @@
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
-// @version               1.3.0
+// @version               1.4.0
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
@@ -43,7 +43,7 @@
     }
 
     function shouldEnable() {
-        let list = ["torrents.php", "top100.php"];
+        let list = ["torrents.php", "top10"];
         for (let page in list) {
             if (window.location.href.indexOf(list[page]) >= 0) {
                 return true;
