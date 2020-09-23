@@ -2,7 +2,7 @@
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
-// @version               1.4.0
+// @version               1.5.0
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
@@ -122,40 +122,61 @@
             a.getElementsByTagName("img")[0].setAttribute("src", img);
         }
 
+        function getDomain(url) {
+            let d = url.split("/");
+            if (d[2]) {
+                return d[2];
+            }
+            return "";
+        }
+
         let desc = document.getElementById("description");
         desc.innerHTML = '<a href="https://github.com/PeratX/RARBGHelper">RARBG Helper</a> Enabled</br>Made by <a href="mailto:peratx@itxtech.org">PeratX@iTXTech.org</a>   ' + githubStar + '<br></br></br>' + desc.innerHTML;
         let a = desc.getElementsByTagName("a");
         for (let i in a) {
             if (typeof a[i] == "object") {
-                GM_xmlhttpRequest({
-                    method: "GET",
-                    url: a[i].getAttribute("href"),
-                    onload: function (response) {
-                        // 22pixx, imgprime
-                        let img = getStringBetween(response.responseText, "<div id='continuetoimage'>", '\" target=');
-                        if (img !== false) {
-                            img = img.trim().replace("<a href=\"", "");
-                            GM_xmlhttpRequest({
-                                method: "GET",
-                                url: img,
-                                onload: function (response) {
-                                    let img = getStringBetween(response.responseText, "<center><a href=", '" ');
-                                    setImage(a[i], img);
+                let url = a[i].getAttribute("href");
+                switch (getDomain(url)) {
+                    /*case "22pixx.xyz":
+                        setImage(a[i], url.replace("ia-o", "o").replace(".html", ""));
+                        break;*/
+                    case "imagecurl.com":
+                        setImage(a[i], url.replace("imagecurl.com", "cdn.imagecurl.com").replace("_thumb", "").replace("viewer.php?file=", "images/"));
+                        break;
+                    default:
+                        GM_xmlhttpRequest({
+                            method: "GET",
+                            url: a[i].getAttribute("href"),
+                            onload: function (response) {
+                                // imgprime, imgking
+                                let img = getStringBetween(response.responseText, "var linkid=", ".html");
+                                if (img === false) {
+                                    img = getStringBetween(response.responseText, "<div id='continuetoimage'>", '.html');
                                 }
-                            });
-                        } else {
-                            // imagecurl
-                            img = getStringBetween(response.responseText, ".html('<br/><a href=", '">');
-                            if (img === false) {
-                                // other sites like imagefruit
-                                img = getStringBetween(response.responseText, "<span id=imagecode ><img src=", '" ');
+                                if (img !== false) {
+                                    img = img.trim().replace("<a href=\"", "") + ".html";
+                                    GM_xmlhttpRequest({
+                                        method: "GET",
+                                        url: img,
+                                        onload: function (response) {
+                                            let img = getStringBetween(response.responseText, "<center><a href=", '" ');
+                                            setImage(a[i], img);
+                                        }
+                                    });
+                                } else {
+                                    // imagecurl
+                                    img = getStringBetween(response.responseText, ".html('<br/><a href=", '">');
+                                    if (img === false) {
+                                        // other sites like imagefruit
+                                        img = getStringBetween(response.responseText, "<span id=imagecode ><img src=", '" ');
+                                    }
+                                    if (img !== false) {
+                                        setImage(a[i], img);
+                                    }
+                                }
                             }
-                            if (img !== false) {
-                                setImage(a[i], img);
-                            }
-                        }
-                    }
-                });
+                        });
+                }
             }
         }
     }
