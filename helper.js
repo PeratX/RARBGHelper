@@ -2,27 +2,45 @@
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
-// @version               1.5.0
+// @version               1.6.0
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
 // @license               Apache License 2.0
 // @match                 *://rarbg.to/*
-// @match                 *://rargb.to/*
+// @match                 *://rarbg2018.org/*    
+// @match                 *://rarbg2019.org/*    
+// @match                 *://rarbg2020.org/*    
+// @match                 *://rarbg2021.org/*    
+// @match                 *://rarbgaccess.org/*  
+// @match                 *://rarbgaccessed.org/*
+// @match                 *://rarbgcdn.org/*     
+// @match                 *://rarbgcore.org/*    
+// @match                 *://rarbgdata.org/*    
+// @match                 *://rarbgenter.org/*   
+// @match                 *://rarbgget.org/*     
+// @match                 *://rarbggo.org/*      
+// @match                 *://rarbgindex.org/*
 // @match                 *://rarbgmirror.org/*
-// @match                 *://rarbgmirror.com/*
-// @match                 *://rarbgproxy.org/*
-// @match                 *://rarbgunblock.com/*
-// @match                 *://rarbg.is/*
-// @match                 *://rarbgmirror.xyz/*
-// @match                 *://rarbg.unblocked.lol/*
-// @match                 *://rarbg.unblockall.org/*
-// @match                 *://rarbgaccess.org/*
-// @match                 *://rarbg2018.org/*
-// @match                 *://rarbgtorrents.org/*
+// @match                 *://rarbgmirrored.org/*
+// @match                 *://rarbgp2p.org/*
 // @match                 *://rarbgproxied.org/*
-// @match                 *://rarbgget.org/*
+// @match                 *://rarbgproxies.org/*
+// @match                 *://rarbgproxy.org/*
 // @match                 *://rarbgprx.org/*
+// @match                 *://rarbgto.org/*
+// @match                 *://rarbgtor.org/*
+// @match                 *://rarbgtorrents.org/*
+// @match                 *://rarbgunblock.org/*
+// @match                 *://rarbgunblocked.org/*
+// @match                 *://rarbgway.org/*
+// @match                 *://rarbgweb.org/*
+// @match                 *://proxyrarbg.org/*
+// @match                 *://unblockedrarbg.org/*
+// @match                 *://rarbg.com/*
+// @match                 *://rarbgmirror.com/*
+// @match                 *://rarbgproxy.com/*
+// @match                 *://rarbgunblock.com/*
 // @connect               *
 // @supportURL            https://github.com/PeratX/RARBGHelper
 // @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/helper.js
