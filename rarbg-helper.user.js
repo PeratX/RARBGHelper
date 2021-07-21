@@ -53,6 +53,7 @@
     const githubStar = '<iframe src="https://ghbtns.com/github-btn.html?user=PeratX&repo=RARBGHelper&type=star&count=true" frameborder="0" scrolling="0" style="height: 20px;max-width: 120px;padding: 0 5px;box-sizing: border-box;margin-top: 5px;"></iframe>';
     const magnetImg  = '<img src="https://dyncdn2.com/static/20/img/magnet.gif"        style="height: 12px; width: 12px; margin-bottom:-2px;" border="0">';
     const downloadImg = '<img src="https://dyncdn.me/static/20/img/16x16/download.png" style="height: 12px; width: 12px; margin-bottom:-2px;" border="0" "="">';
+    const starEmoji   = '&#x2B50';
 
     function getStringBetween(str, begin, end) {
         if (str.indexOf(begin) >= 0) {
@@ -82,7 +83,7 @@
                 fetch(page).then(body => body.text()).then(b => {
                     let parser = new DOMParser().parseFromString(b, "text/html");
                     let dl = parser.querySelector("td.lista a[id]");
-                    a.parentNode.innerHTML += "<span>Rating: " + parser.querySelector("li.current-rating").innerHTML.replace("Currently ", "").trim().replace(/(\d\.\d)\d/, "$1") + "     </span>" +
+                    a.parentNode.innerHTML += "<span>" + starEmoji +": " + parser.querySelector("li.current-rating").innerHTML.replace("Currently ", "").trim().replace(/(\d\.\d)\d/, "$1") + "     </span>" +
                         '<a href="' + dl.getAttribute("href") + '">' + downloadImg + '</a><span>     </span><a href="' + dl.nextElementSibling.getAttribute("href") + '">' + magnetImg + '</a>';
                 })
             }
