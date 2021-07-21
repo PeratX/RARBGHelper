@@ -43,6 +43,7 @@
 // @match                 *://rarbgunblock.com/*
 // @connect               *
 // @supportURL            https://github.com/PeratX/RARBGHelper
+// @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/helper.js
 // @grant                 GM_xmlhttpRequest
 // ==/UserScript==
 
