@@ -83,8 +83,16 @@
                 fetch(page).then(body => body.text()).then(b => {
                     let parser = new DOMParser().parseFromString(b, "text/html");
                     let dl = parser.querySelector("td.lista a[id]");
-                    a.parentNode.innerHTML += "<span>" + starEmoji +": " + parser.querySelector("li.current-rating").innerHTML.replace("Currently ", "").trim().replace(/(\d\.\d)\d/, "$1") + "     </span>" +
-                        '<a href="' + dl.getAttribute("href") + '">' + downloadImg + '</a><span>     </span><a href="' + dl.nextElementSibling.getAttribute("href") + '">' + magnetImg + '</a>';
+                    let ratingElem = parser.querySelector("li.current-rating");
+
+                    let ratingText = ratingElem?.innerHTML ?? "Not found: Try opening a torrent page to see if rate limited";
+                    ratingText = ratingText.replace("Currently ", "").trim().replace(/(\d\.\d)\d/, "$1");
+
+                    let dlLink = dl?.getAttribute("href") ?? "javascript:void(0)";
+                    let magnetLink = dl?.nextElementSibling.getAttribute("href") ?? "javascript:void(0)";
+
+                    a.parentNode.innerHTML += "<span>" + starEmoji +": " + ratingText + "     </span>" +
+                        '<a href="' + dlLink + '">' + downloadImg + '</a><span>     </span><a href="' + magnetLink + '">' + magnetImg + '</a>';
                 })
             }
         }
