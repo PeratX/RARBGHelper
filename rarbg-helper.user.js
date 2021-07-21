@@ -51,8 +51,8 @@
     'use strict';
 
     const githubStar = '<iframe src="https://ghbtns.com/github-btn.html?user=PeratX&repo=RARBGHelper&type=star&count=true" frameborder="0" scrolling="0" style="height: 20px;max-width: 120px;padding: 0 5px;box-sizing: border-box;margin-top: 5px;"></iframe>';
-    const magnetImg  = '<img src="https://dyncdn2.com/static/20/img/magnet.gif" border="0">';
-    const downloadImg = '<img src="https://dyncdn.me/static/20/img/16x16/download.png" style="height: 12px; width: 12px;" border="0" "="">';
+    const magnetImg  = '<img src="https://dyncdn2.com/static/20/img/magnet.gif"        style="height: 12px; width: 12px; margin-bottom:-2px;" border="0">';
+    const downloadImg = '<img src="https://dyncdn.me/static/20/img/16x16/download.png" style="height: 12px; width: 12px; margin-bottom:-2px;" border="0" "="">';
 
     function getStringBetween(str, begin, end) {
         if (str.indexOf(begin) >= 0) {
