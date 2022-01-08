@@ -209,4 +209,29 @@
             }
         }
     }
+
+    const listed = JSON.parse(localStorage.getItem("listed") || "[]");
+    const opened = JSON.parse(localStorage.getItem("opened") || "[]");
+  
+    for (const element of document.querySelectorAll(
+      '.lista2t td:nth-child(2) > a[onmouseover^="return overlib"]'
+    ) || []) {
+      if (-1 < listed.indexOf(element.href))
+        element.closest("tr").style.borderLeft = "2px solid yellow";
+      else listed.push(element.href);
+  
+      if (-1 < opened.indexOf(element.href))
+        element.closest("tr").style.borderLeft = "2px solid red";
+    }
+  
+    if (
+      location.href.match(
+        /https?:\/\/(proxy|unblocked)?rarbg[0-9a-z]*?\.[a-z]{2,4}\/torrent\/[^\/\?]+/
+      ) &&
+      opened.indexOf(location.href) === -1
+    )
+      opened.push(location.href);
+  
+    localStorage.setItem("listed", JSON.stringify(listed));
+    localStorage.setItem("opened", JSON.stringify(opened));
 })();
