@@ -33,7 +33,7 @@ Install via [GreasyFork](https://greasyfork.org/en/scripts/396019-rarbg-helper)
 
 ## License
 
-    Copyright (C) 2020 PeratX
+    Copyright (C) 2020-2022 PeratX
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

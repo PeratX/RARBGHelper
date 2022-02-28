@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
-// @namespace             https://peratx.net
-// @version               1.6.1
+// @namespace             https://github.com/PeratX/RARBGHelper
+// @version               1.7.0
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
@@ -43,7 +43,7 @@
 // @match                 *://rarbgunblock.com/*
 // @connect               *
 // @supportURL            https://github.com/PeratX/RARBGHelper
-// @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/helper.js
+// @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/rarbg-helper.user.js
 // @grant                 GM_xmlhttpRequest
 // ==/UserScript==
 
@@ -51,9 +51,9 @@
     'use strict';
 
     const githubStar = '<iframe src="https://ghbtns.com/github-btn.html?user=PeratX&repo=RARBGHelper&type=star&count=true" frameborder="0" scrolling="0" style="height: 20px;max-width: 120px;padding: 0 5px;box-sizing: border-box;margin-top: 5px;"></iframe>';
-    const magnetImg  = '<img src="https://dyncdn2.com/static/20/img/magnet.gif"        style="height: 12px; width: 12px; margin-bottom:-2px;" border="0">';
+    const magnetImg = '<img src="https://dyncdn2.com/static/20/img/magnet.gif"        style="height: 12px; width: 12px; margin-bottom:-2px;" border="0">';
     const downloadImg = '<img src="https://dyncdn.me/static/20/img/16x16/download.png" style="height: 12px; width: 12px; margin-bottom:-2px;" border="0" "="">';
-    const starEmoji   = '&#x2B50';
+    const starEmoji = '&#x2B50';
 
     function getStringBetween(str, begin, end) {
         if (str.indexOf(begin) >= 0) {
@@ -91,7 +91,7 @@
                     let dlLink = dl?.getAttribute("href") ?? "javascript:void(0)";
                     let magnetLink = dl?.nextElementSibling.getAttribute("href") ?? "javascript:void(0)";
 
-                    a.parentNode.innerHTML += "<span>" + starEmoji +": " + ratingText + "     </span>" +
+                    a.parentNode.innerHTML += "<span>" + starEmoji + ": " + ratingText + "     </span>" +
                         '<a href="' + dlLink + '">' + downloadImg + '</a><span>     </span><a href="' + magnetLink + '">' + magnetImg + '</a>';
                 })
             }
@@ -212,26 +212,26 @@
 
     const listed = JSON.parse(localStorage.getItem("listed") || "[]");
     const opened = JSON.parse(localStorage.getItem("opened") || "[]");
-  
+
     for (const element of document.querySelectorAll(
-      '.lista2t td:nth-child(2) > a[onmouseover^="return overlib"]'
+        '.lista2t td:nth-child(2) > a[onmouseover^="return overlib"]'
     ) || []) {
-      if (-1 < listed.indexOf(element.href))
-        element.closest("tr").style.borderLeft = "2px solid yellow";
-      else listed.push(element.href);
-  
-      if (-1 < opened.indexOf(element.href))
-        element.closest("tr").style.borderLeft = "2px solid red";
+        if (-1 < listed.indexOf(element.href))
+            element.closest("tr").style.borderLeft = "2px solid yellow";
+        else listed.push(element.href);
+
+        if (-1 < opened.indexOf(element.href))
+            element.closest("tr").style.borderLeft = "2px solid red";
     }
-  
+
     if (
-      location.href.match(
-        /https?:\/\/(proxy|unblocked)?rarbg[0-9a-z]*?\.[a-z]{2,4}\/torrent\/[^\/\?]+/
-      ) &&
-      opened.indexOf(location.href) === -1
+        location.href.match(
+            /https?:\/\/(proxy|unblocked)?rarbg[0-9a-z]*?\.[a-z]{2,4}\/torrent\/[^\/\?]+/
+        ) &&
+        opened.indexOf(location.href) === -1
     )
-      opened.push(location.href);
-  
+        opened.push(location.href);
+
     localStorage.setItem("listed", JSON.stringify(listed));
     localStorage.setItem("opened", JSON.stringify(opened));
 })();
