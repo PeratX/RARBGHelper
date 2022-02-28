@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
-// @namespace             https://github.com/PeratX/RARBGHelper
+// @namespace             https://peratx.net
 // @version               1.7.0
 // @description           Powerful Toolbox for RARBG.
 // @description:zh-cn     为 RARBG 定制的强力工具箱。
