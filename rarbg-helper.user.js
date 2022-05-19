@@ -1,25 +1,23 @@
 // ==UserScript==
-// @name                  RARBG Helper
-// @name:zh-CN            RARBG 助手
-// @namespace             https://peratx.net
-// @version               1.7.0
-// @description           Powerful Toolbox for RARBG.
-// @description:zh-cn     为 RARBG 定制的强力工具箱。
 // @author                PeratX
+// @connect               *
+// @description           Powerful Toolbox for RARBG
+// @description:zh-cn     为 RARBG 定制的强力工具箱
+// @grant                 GM_xmlhttpRequest
 // @license               Apache License 2.0
 // @match                 *://rarbg.to/*
-// @match                 *://rarbg2018.org/*    
-// @match                 *://rarbg2019.org/*    
-// @match                 *://rarbg2020.org/*    
-// @match                 *://rarbg2021.org/*    
-// @match                 *://rarbgaccess.org/*  
+// @match                 *://rarbg2018.org/*
+// @match                 *://rarbg2019.org/*
+// @match                 *://rarbg2020.org/*
+// @match                 *://rarbg2021.org/*
+// @match                 *://rarbgaccess.org/*
 // @match                 *://rarbgaccessed.org/*
-// @match                 *://rarbgcdn.org/*     
-// @match                 *://rarbgcore.org/*    
-// @match                 *://rarbgdata.org/*    
-// @match                 *://rarbgenter.org/*   
-// @match                 *://rarbgget.org/*     
-// @match                 *://rarbggo.org/*      
+// @match                 *://rarbgcdn.org/*
+// @match                 *://rarbgcore.org/*
+// @match                 *://rarbgdata.org/*
+// @match                 *://rarbgenter.org/*
+// @match                 *://rarbgget.org/*
+// @match                 *://rarbggo.org/*
 // @match                 *://rarbgindex.org/*
 // @match                 *://rarbgmirror.org/*
 // @match                 *://rarbgmirrored.org/*
@@ -41,197 +39,158 @@
 // @match                 *://rarbgmirror.com/*
 // @match                 *://rarbgproxy.com/*
 // @match                 *://rarbgunblock.com/*
-// @connect               *
+// @name                  RARBG Helper
+// @name:zh-CN            RARBG 助手
+// @namespace             https://peratx.net
 // @supportURL            https://github.com/PeratX/RARBGHelper
 // @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/rarbg-helper.user.js
-// @grant                 GM_xmlhttpRequest
+// @version               1.7.1
 // ==/UserScript==
 
-(function () {
-    'use strict';
+(async () => {
+  "use strict";
 
-    const githubStar = '<iframe src="https://ghbtns.com/github-btn.html?user=PeratX&repo=RARBGHelper&type=star&count=true" frameborder="0" scrolling="0" style="height: 20px;max-width: 120px;padding: 0 5px;box-sizing: border-box;margin-top: 5px;"></iframe>';
-    const magnetImg = '<img src="https://dyncdn2.com/static/20/img/magnet.gif"        style="height: 12px; width: 12px; margin-bottom:-2px;" border="0">';
-    const downloadImg = '<img src="https://dyncdn.me/static/20/img/16x16/download.png" style="height: 12px; width: 12px; margin-bottom:-2px;" border="0" "="">';
-    const starEmoji = '&#x2B50';
+  const settings = {
+    downloadImg: '<img src="//dyncdn.me/static/20/img/16x16/download.png" style="height:12px;margin-bottom:-2px;" />',
+    githubStar: '<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;"></iframe></div>',
+    localStorageMaxEntries: 1000,
+    magnetImg: '<img src="//dyncdn.me/static/20/img/magnet.gif" style="height:12px;margin-bottom:-2px;" />',
+    modifications: [
+      {
+        ref: '#description img[src*="22pixx.xyz/os/"], #description img[src*="22pixx.xyz/rs/"], #description img[src*="22pixx.xyz/s/"]',
+        handler(img) {
+          img.src = img.src.replace(new RegExp(/\.xyz\/os\//), ".xyz/o/");
+          img.src = img.src.replace(new RegExp(/\.xyz\/rs\//), ".xyz/r/");
+          img.src = img.src.replace(new RegExp(/\.xyz\/s\//), ".xyz/i/");
 
-    function getStringBetween(str, begin, end) {
-        if (str.indexOf(begin) >= 0) {
-            let index = str.indexOf(begin);
-            return str.substring(index + begin.length + 1, str.indexOf(end, index));
-        }
-        return false;
+          img.style.maxWidth = "unset";
+          img.style.width = "100%";
+        },
+      },
+      {
+        ref: '#description img[src*="imagecurl.com/images/"]',
+        handler(img) {
+          img.src = img.src.replace(new RegExp(/_thumb\./), ".");
+
+          img.style.maxWidth = "unset";
+          img.style.width = "100%";
+        },
+      },
+      {
+        ref: '#description img[src*="freebunker.com/tn/t"], #description img[src*="imgcarry.com/tn/t"], #description img[src*="imgshots.com/tn/t"], #description img[src*="imagesnake.com/tn/t"], #description img[src*="pornbus.org/tn/t"]',
+        handler(img) {
+          img.src = img.src.replace(new RegExp(/\/tn\/t/), "tn/i");
+
+          img.style.maxWidth = "unset";
+          img.style.width = "100%";
+        },
+      },
+      {
+        ref: '#description img[src*="imgprime.com/uploads/"]',
+        handler(img) {
+          img.src = img.src.replace(new RegExp(/\/small\//), "/big/");
+
+          img.style.maxWidth = "unset";
+          img.style.width = "100%";
+        },
+      },
+    ],
+  };
+
+  function shouldEnable() {
+    for (let match of ["/top10", "/torrents.php"])
+      if (-1 < window.location.href.indexOf(match))
+        return true;
+    return false;
+  }
+
+  if (shouldEnable()) {
+    const cache = [];
+
+    function addSuffix(element) {
+      const url = element?.getAttribute("href");
+      if (!cache.includes(url)) {
+        cache.push(url);
+
+        fetch(url)
+          .then((res) => res.text())
+          .then((res) => {
+            const $ = new DOMParser().parseFromString(res, "text/html");
+
+            const ref = $.querySelector("td.lista a[id]");
+
+            const downloadLink = ref?.getAttribute("href");
+            const magnetLink = ref?.nextElementSibling?.getAttribute("href")
+
+            const ratingStars = $.querySelector("#ratingstars p")?.innerText || ''
+
+            element.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars
+          });
+      }
     }
 
-    function shouldEnable() {
-        let list = ["torrents.php", "top10"];
-        for (let page in list) {
-            if (window.location.href.indexOf(list[page]) >= 0) {
-                return true;
-            }
+    for (let element of document.querySelectorAll('tr.lista2 > td:nth-child(2) > a[href^="/torrent/"]') || []) {
+      const onMouseOver = element.attributes.onmouseover;
+      if (onMouseOver === false) continue;
+
+      // add suffix
+      element.addEventListener("mouseover", () => addSuffix(element));
+
+      // process image
+      const parts = onMouseOver.value.split("/");
+      switch (parts[3]) {
+        case "static": {
+          switch (parts[4]) {
+            case "over": // 18+
+              onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
+              break;
+            case "20": // tvdb
+              onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
+              break;
+          }
+
+          break;
         }
-        return false;
+        case "mimages": // movie
+          onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
+          break;
+      }
     }
 
-    if (shouldEnable()) {
-        let cache = [];
+    document.onmousemove = (e) => {
+      const xoff = e.pageX + xoffset;
+      const yoff = e.pageY + yoffset;
 
-        function addRating(a) {
-            let page = a.getAttribute("href")
-            if (!cache[page]) {
-                cache[page] = true;
-                fetch(page).then(body => body.text()).then(b => {
-                    let parser = new DOMParser().parseFromString(b, "text/html");
-                    let dl = parser.querySelector("td.lista a[id]");
-                    let ratingElem = parser.querySelector("li.current-rating");
+      if (pop.children[0]) {
+        const top = document.scrollingElement.scrollTop + document.scrollingElement.clientHeight - pop.children[0].height - 10;
+        if (yoff > top) yoff = top;
+      }
 
-                    let ratingText = ratingElem?.innerHTML ?? "Not found: Try opening a torrent page to see if rate limited";
-                    ratingText = ratingText.replace("Currently ", "").trim().replace(/(\d\.\d)\d/, "$1");
+      pop.style.left = xoff + "px";
+      pop.style.top = yoff + "px";
+    };
 
-                    let dlLink = dl?.getAttribute("href") ?? "javascript:void(0)";
-                    let magnetLink = dl?.nextElementSibling.getAttribute("href") ?? "javascript:void(0)";
+    document.querySelector("#searchTorrent").innerHTML = settings.githubStar + document.querySelector("#searchTorrent").innerHTML;
+  } else {
+    for (const modification of settings.modifications)
+      if (modification.handler)
+        for (const ref of document.querySelectorAll(modification.ref) || [])
+          modification.handler(ref);
+  }
 
-                    a.parentNode.innerHTML += "<span>" + starEmoji + ": " + ratingText + "     </span>" +
-                        '<a href="' + dlLink + '">' + downloadImg + '</a><span>     </span><a href="' + magnetLink + '">' + magnetImg + '</a>';
-                })
-            }
-        }
+  const opened = JSON.parse(localStorage.getItem("opened") || "[]");
+  const viewed = JSON.parse(localStorage.getItem("viewed") || "[]");
 
-        document.onmousemove = function (k) {
-            let xoff = k.pageX + xoffset;
-            let yoff = k.pageY + yoffset;
-            el = k.target || k.srcElement
+  for (const element of document.querySelectorAll('tr.lista2 > td:nth-child(2) > a[href^="/torrent/"]') || []) {
+    if (viewed.includes(element.href)) element.closest("tr").style.borderLeft = "2px solid yellow";
+    else viewed.push(element.href);
 
-            if (pop.children[0]) {
-                let top = document.scrollingElement.scrollTop + document.scrollingElement.clientHeight - pop.children[0].height - 10
-                if (yoff > top) {
-                    yoff = top
-                }
-            }
-            pop.style.top = yoff + "px";
-            pop.style.left = xoff + "px"
-        };
+    if (opened.includes(element.href)) element.closest("tr").style.borderLeft = "2px solid red";
+  }
 
-        let td = document.querySelectorAll('tr[class="lista2"] > td:nth-child(2)')
-        for (let i = 0; i < td.length; i++) {
-            td[i].innerHTML += '<a href="https://github.com/PeratX/RARBGHelper" target="_blank"><img src="https://github.githubassets.com/favicon.ico" border="0" style="width: 12px;"></a><span>     </span>'
-        }
-        let a = document.querySelectorAll('tr[class="lista2"] > td:nth-child(2) >a:nth-child(1)')
-        for (let i = 0; i < a.length; i++) {
-            let ev = a[i].attributes.onmouseover
-            if (ev === false) {
-                continue
-            }
-            a[i].addEventListener('mouseover', function (e) {
-                addRating(a[i])
-            })
-            // process image
-            let parts = ev.value.split('/')
-            switch (parts[3]) {
-                case 'static':
-                    switch (parts[4]) {
-                        case 'over': //18+
-                            ev.value = ev.value.replace('static/over', 'posters2/' + parts[5].substr(0, 1))
-                            break;
-                        case '20': //TVdb
-                            ev.value = ev.value.replace('_small', '_banner_optimized')
-                            break;
-                    }
-                    break;
-                case 'mimages': //movie
-                    ev.value = ev.value.replace('over_opt', 'poster_opt')
-                    break;
-            }
-        }
+  if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href))
+    opened.push(location.href);
 
-        document.getElementById("divadvsearch").innerHTML += "<span>RARBG Helper</span>" + githubStar
-    } else {
-        function setImage(a, img) {
-            a.setAttribute("href", img);
-            a.getElementsByTagName("img")[0].setAttribute("src", img);
-        }
-
-        function getDomain(url) {
-            let d = url.split("/");
-            if (d[2]) {
-                return d[2];
-            }
-            return "";
-        }
-
-        let desc = document.getElementById("description");
-        desc.innerHTML = '<a href="https://github.com/PeratX/RARBGHelper">RARBG Helper</a> Enabled</br>Made by <a href="mailto:peratx@itxtech.org">PeratX@iTXTech.org</a>   ' + githubStar + '<br></br></br>' + desc.innerHTML;
-        let a = desc.getElementsByTagName("a");
-        for (let i in a) {
-            if (typeof a[i] == "object") {
-                let url = a[i].getAttribute("href");
-                switch (getDomain(url)) {
-                    /*case "22pixx.xyz":
-                        setImage(a[i], url.replace("ia-o", "o").replace(".html", ""));
-                        break;*/
-                    case "imagecurl.com":
-                        setImage(a[i], url.replace("imagecurl.com", "cdn.imagecurl.com").replace("_thumb", "").replace("viewer.php?file=", "images/"));
-                        break;
-                    default:
-                        GM_xmlhttpRequest({
-                            method: "GET",
-                            url: a[i].getAttribute("href"),
-                            onload: function (response) {
-                                // imgprime, imgking
-                                let img = getStringBetween(response.responseText, "var linkid=", ".html");
-                                if (img === false) {
-                                    img = getStringBetween(response.responseText, "<div id='continuetoimage'>", '.html');
-                                }
-                                if (img !== false) {
-                                    img = img.trim().replace("<a href=\"", "") + ".html";
-                                    GM_xmlhttpRequest({
-                                        method: "GET",
-                                        url: img,
-                                        onload: function (response) {
-                                            let img = getStringBetween(response.responseText, "<center><a href=", "' ");
-                                            setImage(a[i], img);
-                                        }
-                                    });
-                                } else {
-                                    // imagecurl
-                                    img = getStringBetween(response.responseText, ".html('<br/><a href=", '">');
-                                    if (img === false) {
-                                        // other sites like imagefruit
-                                        img = getStringBetween(response.responseText, "<span id=imagecode ><img src=", '" ');
-                                    }
-                                    if (img !== false) {
-                                        setImage(a[i], img);
-                                    }
-                                }
-                            }
-                        });
-                }
-            }
-        }
-    }
-
-    const listed = JSON.parse(localStorage.getItem("listed") || "[]");
-    const opened = JSON.parse(localStorage.getItem("opened") || "[]");
-
-    for (const element of document.querySelectorAll(
-        '.lista2t td:nth-child(2) > a[onmouseover^="return overlib"]'
-    ) || []) {
-        if (-1 < listed.indexOf(element.href))
-            element.closest("tr").style.borderLeft = "2px solid yellow";
-        else listed.push(element.href);
-
-        if (-1 < opened.indexOf(element.href))
-            element.closest("tr").style.borderLeft = "2px solid red";
-    }
-
-    if (
-        location.href.match(
-            /https?:\/\/(proxy|unblocked)?rarbg[0-9a-z]*?\.[a-z]{2,4}\/torrent\/[^\/\?]+/
-        ) &&
-        opened.indexOf(location.href) === -1
-    )
-        opened.push(location.href);
-
-    localStorage.setItem("listed", JSON.stringify(listed));
-    localStorage.setItem("opened", JSON.stringify(opened));
+  localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
+  localStorage.setItem("opened", JSON.stringify(opened.slice(~settings.localStorageMaxEntries + 1)));
 })();
