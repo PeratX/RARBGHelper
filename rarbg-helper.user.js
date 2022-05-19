@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name                  RARBG Helper
+// @name:zh-CN            RARBG 助手
 // @author                PeratX
 // @connect               *
 // @description           Powerful Toolbox for RARBG
@@ -40,11 +41,10 @@
 // @match                 *://rarbgmirror.com/*
 // @match                 *://rarbgproxy.com/*
 // @match                 *://rarbgunblock.com/*
-// @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
 // @supportURL            https://github.com/PeratX/RARBGHelper
 // @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/rarbg-helper.user.js
-// @version               1.7.1
+// @version               1.7.2
 // ==/UserScript==
 
 (async () => {
@@ -52,7 +52,8 @@
 
   const settings = {
     downloadImg: '<img src="//dyncdn.me/static/20/img/16x16/download.png" style="height:12px;margin-bottom:-2px;" />',
-    githubStar: '<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;"></iframe></div>',
+    info: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe><input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;load torrent info inline on hover</div>`,
+    loadInfoOnHover: (typeof localStorage.getItem("loadInfoOnHover") === 'string' ? !!localStorage.getItem("loadInfoOnHover") : true),
     localStorageMaxEntries: 1000,
     magnetImg: '<img src="//dyncdn.me/static/20/img/magnet.gif" style="height:12px;margin-bottom:-2px;" />',
     modifications: [
@@ -136,13 +137,17 @@
   }
 
   for (let element of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
-    if (viewed.includes(element.href)) element.closest("tr").style.borderLeft = "2px solid yellow";
+    if (viewed.includes(element.href)) element.closest("tr").firstChild.style.borderLeft = "2px solid yellow";
     else viewed.push(element.href);
 
-    if (opened.includes(element.href)) element.closest("tr").style.borderLeft = "2px solid red";
+    if (opened.includes(element.href))
+      element.closest("tr").firstChild.style.borderLeft = "2px solid red";
 
     const onMouseOver = element.attributes.onmouseover;
     if (!onMouseOver) continue;
+
+    if (settings.loadInfoOnHover)
+      element.addEventListener("mouseover", () => addSuffix(element));
 
     const parts = onMouseOver.value.split("/");
     switch (parts[3]) {
@@ -164,13 +169,13 @@
         onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
         break;
     }
-
-    element.addEventListener("mouseover", () => addSuffix(element));
   }
 
   const searchBox = document.querySelector("#searchTorrent");
-  if (searchBox) searchBox.innerHTML = settings.githubStar + searchBox.innerHTML;
-  else {
+  if (searchBox) {
+    searchBox.innerHTML = settings.info + searchBox.innerHTML;
+    searchBox.querySelector('input[type="checkbox"]').checked = settings.loadInfoOnHover;
+  } else {
     for (const modification of settings.modifications)
       if (modification.handler)
         for (const ref of document.querySelectorAll(modification.ref) || [])
