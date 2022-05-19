@@ -131,7 +131,7 @@
 
     for (let element of document.querySelectorAll('tr.lista2 > td:nth-child(2) > a[href^="/torrent/"]') || []) {
       const onMouseOver = element.attributes.onmouseover;
-      if (onMouseOver === false) continue;
+      if (!onMouseOver) continue;
 
       // add suffix
       element.addEventListener("mouseover", () => addSuffix(element));
