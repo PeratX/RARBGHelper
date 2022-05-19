@@ -1,4 +1,5 @@
 // ==UserScript==
+// @name                  RARBG Helper
 // @author                PeratX
 // @connect               *
 // @description           Powerful Toolbox for RARBG
@@ -39,7 +40,6 @@
 // @match                 *://rarbgmirror.com/*
 // @match                 *://rarbgproxy.com/*
 // @match                 *://rarbgunblock.com/*
-// @name                  RARBG Helper
 // @name:zh-CN            RARBG 助手
 // @namespace             https://peratx.net
 // @supportURL            https://github.com/PeratX/RARBGHelper
@@ -97,94 +97,84 @@
     ],
   };
 
-  function shouldEnable() {
-    for (let match of ["/top10", "/torrents.php"])
-      if (-1 < window.location.href.indexOf(match))
-        return true;
-    return false;
-  }
-
-  if (shouldEnable()) {
-    const cache = [];
-
-    function addSuffix(element) {
-      const url = element?.getAttribute("href");
-      if (!cache.includes(url)) {
-        cache.push(url);
-
-        fetch(url)
-          .then((res) => res.text())
-          .then((res) => {
-            const $ = new DOMParser().parseFromString(res, "text/html");
-
-            const ratingStars = $.querySelector("#ratingstars p")?.innerText || '';
-            const ref = $.querySelector("td.lista a[id]");
-
-            const downloadLink = ref?.getAttribute("href");
-            const magnetLink = ref?.nextElementSibling?.getAttribute("href");
-
-            element.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
-          });
-      }
-    }
-
-    for (let element of document.querySelectorAll('tr.lista2 > td:nth-child(2) > a[href^="/torrent/"]') || []) {
-      const onMouseOver = element.attributes.onmouseover;
-      if (!onMouseOver) continue;
-
-      // add suffix
-      element.addEventListener("mouseover", () => addSuffix(element));
-
-      // process image
-      const parts = onMouseOver.value.split("/");
-      switch (parts[3]) {
-        case "static": {
-          switch (parts[4]) {
-            case "over": // 18+
-              onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
-              break;
-            case "20": // tvdb
-              onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
-              break;
-          }
-
-          break;
-        }
-        case "mimages": // movie
-          onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
-          break;
-      }
-    }
-
-    document.onmousemove = (e) => {
-      const xoff = e.pageX + xoffset;
-      const yoff = e.pageY + yoffset;
-
-      if (pop.children[0]) {
-        const top = document.scrollingElement.scrollTop + document.scrollingElement.clientHeight - pop.children[0].height - 10;
-        if (yoff > top) yoff = top;
-      }
-
-      pop.style.left = xoff + "px";
-      pop.style.top = yoff + "px";
-    };
-
-    document.querySelector("#searchTorrent").innerHTML = settings.githubStar + document.querySelector("#searchTorrent").innerHTML;
-  } else {
-    for (const modification of settings.modifications)
-      if (modification.handler)
-        for (const ref of document.querySelectorAll(modification.ref) || [])
-          modification.handler(ref);
-  }
-
   const opened = JSON.parse(localStorage.getItem("opened") || "[]");
   const viewed = JSON.parse(localStorage.getItem("viewed") || "[]");
 
-  for (const element of document.querySelectorAll('tr.lista2 > td:nth-child(2) > a[href^="/torrent/"]') || []) {
+  document.onmousemove = (e) => {
+    let xoff = e.pageX + xoffset;
+    let yoff = e.pageY + yoffset;
+
+    if (pop.children[0]) {
+      const top = document.scrollingElement.scrollTop + document.scrollingElement.clientHeight - pop.children[0].height - 10;
+      if (yoff > top) yoff = top;
+    }
+
+    pop.style.left = xoff + "px";
+    pop.style.top = yoff + "px";
+  };
+
+  const cache = [];
+  function addSuffix(element) {
+    const url = element?.getAttribute("href");
+    if (!cache.includes(url)) {
+      cache.push(url);
+
+      fetch(url)
+        .then((res) => res.text())
+        .then((res) => {
+          const $ = new DOMParser().parseFromString(res, "text/html");
+
+          const ratingStars = $.querySelector("#ratingstars p")?.innerText || '';
+          const ref = $.querySelector("td.lista a[id]");
+
+          const downloadLink = ref?.getAttribute("href");
+          const magnetLink = ref?.nextElementSibling?.getAttribute("href");
+
+          element.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
+        });
+    }
+  }
+
+  for (let element of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
     if (viewed.includes(element.href)) element.closest("tr").style.borderLeft = "2px solid yellow";
     else viewed.push(element.href);
 
     if (opened.includes(element.href)) element.closest("tr").style.borderLeft = "2px solid red";
+
+    const onMouseOver = element.attributes.onmouseover;
+    if (!onMouseOver) continue;
+
+    const parts = onMouseOver.value.split("/");
+    switch (parts[3]) {
+      case "static": {
+        switch (parts[4]) {
+          case "over": // 18+
+            onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
+            break;
+
+          case "20": // tvdb
+            onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
+            break;
+        }
+
+        break;
+      }
+
+      case "mimages": // movie
+        onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
+        break;
+    }
+
+    element.addEventListener("mouseover", () => addSuffix(element));
+  }
+
+  const searchBox = document.querySelector("#searchTorrent");
+  if (searchBox) searchBox.innerHTML = settings.githubStar + searchBox.innerHTML;
+  else {
+    for (const modification of settings.modifications)
+      if (modification.handler)
+        for (const ref of document.querySelectorAll(modification.ref) || [])
+          modification.handler(ref);
   }
 
   if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href))
