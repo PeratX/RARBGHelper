@@ -117,14 +117,13 @@
           .then((res) => {
             const $ = new DOMParser().parseFromString(res, "text/html");
 
+            const ratingStars = $.querySelector("#ratingstars p")?.innerText || '';
             const ref = $.querySelector("td.lista a[id]");
 
             const downloadLink = ref?.getAttribute("href");
-            const magnetLink = ref?.nextElementSibling?.getAttribute("href")
+            const magnetLink = ref?.nextElementSibling?.getAttribute("href");
 
-            const ratingStars = $.querySelector("#ratingstars p")?.innerText || ''
-
-            element.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars
+            element.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
           });
       }
     }
@@ -191,6 +190,6 @@
   if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href))
     opened.push(location.href);
 
-  localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
   localStorage.setItem("opened", JSON.stringify(opened.slice(~settings.localStorageMaxEntries + 1)));
+  localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
 })();
