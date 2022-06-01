@@ -44,7 +44,7 @@
 // @namespace             https://peratx.net
 // @supportURL            https://github.com/PeratX/RARBGHelper
 // @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/rarbg-helper.user.js
-// @version               1.7.3
+// @version               1.7.4
 // ==/UserScript==
 
 (async () => {
@@ -137,11 +137,11 @@
   }
 
   for (let element of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
-    if (viewed.includes(element.href)) element.parentNode.parentNode.style.borderLeft = "2px solid yellow";
+    const node = !element.parentNode.parentNode.firstChild.tagName ? element.parentNode.parentNode : element.parentNode.parentNode.firstChild;
+    if (viewed.includes(element.href)) node.style.borderLeft = "2px solid yellow";
     else viewed.push(element.href);
 
-    if (opened.includes(element.href))
-      element.parentNode.parentNode.style.borderLeft = "2px solid red";
+    if (opened.includes(element.href)) node.style.borderLeft = "2px solid red";
 
     const onMouseOver = element.attributes.onmouseover;
     if (!onMouseOver) continue;
