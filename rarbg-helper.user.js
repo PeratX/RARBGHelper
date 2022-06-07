@@ -52,7 +52,7 @@
 
   const settings = {
     downloadImg: '<img src="//dyncdn.me/static/20/img/16x16/download.png" style="height:12px;margin-bottom:-2px;" />',
-    info: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe>&nbsp;<input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;load torrent info inline on hover</div>`,
+    options: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe>&nbsp;<input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;show more options on hover</div>`,
     loadInfoOnHover: (typeof localStorage.getItem("loadInfoOnHover") === 'string' ? !!localStorage.getItem("loadInfoOnHover") : true),
     localStorageMaxEntries: 1000,
     magnetImg: '<img src="//dyncdn.me/static/20/img/magnet.gif" style="height:12px;margin-bottom:-2px;" />',
@@ -98,8 +98,20 @@
     ],
   };
 
-  const opened = JSON.parse(localStorage.getItem("opened") || "[]");
-  const viewed = JSON.parse(localStorage.getItem("viewed") || "[]");
+  let headerNode;
+  if (document.querySelector("#searchTorrent"))
+    headerNode = document.querySelector("#searchTorrent")?.closest("form");
+  else if (document.querySelector('td[align="center"] > b')?.innerText?.match(/top 100? torrents/i))
+    headerNode = document.querySelector('td[align="center"] > b')?.closest("table");
+
+  if (headerNode) {
+    headerNode.innerHTML = settings.options + headerNode.innerHTML;
+    headerNode.querySelector('input[type="checkbox"]').checked = settings.loadInfoOnHover;
+  } else
+    for (const modification of settings.modifications)
+      if (modification.handler)
+        for (const ref of document.querySelectorAll(modification.ref) || [])
+          modification.handler(ref);
 
   document.onmousemove = (e) => {
     let xoff = e.pageX + xoffset;
@@ -115,8 +127,9 @@
   };
 
   const cache = [];
-  function addSuffix(element) {
-    const url = element?.getAttribute("href");
+  function addSuffix(node) {
+    const url = node?.getAttribute("href");
+
     if (!cache.includes(url)) {
       cache.push(url);
 
@@ -131,61 +144,51 @@
           const downloadLink = ref?.getAttribute("href");
           const magnetLink = ref?.nextElementSibling?.getAttribute("href");
 
-          element.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
+          node.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
         });
     }
   }
 
-  for (let element of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
-    const border = element.closest("tr")?.firstElementChild;
+  const opened = JSON.parse(localStorage.getItem("opened") || "[]");
+  const viewed = JSON.parse(localStorage.getItem("viewed") || "[]");
 
-    if (viewed.includes(element.href)) border.style.borderLeft = "2px solid yellow";
-    else viewed.push(element.href);
+  setTimeout(() => {
+    for (let node of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
+      const borderNode = node.closest("tr")?.firstElementChild;
 
-    if (opened.includes(element.href)) border.style.borderLeft = "2px solid red";
+      if (viewed.includes(node.href)) borderNode.style.borderLeft = "2px solid yellow";
+      else viewed.push(node.href);
 
-    const onMouseOver = element.attributes.onmouseover;
-    if (!onMouseOver) continue;
+      if (opened.includes(node.href)) borderNode.style.borderLeft = "2px solid red";
 
-    if (settings.loadInfoOnHover)
-      element.addEventListener("mouseover", () => addSuffix(element));
+      const onMouseOver = node.attributes.onmouseover;
+      if (!onMouseOver) continue;
 
-    const parts = onMouseOver.value.split("/");
-    switch (parts[3]) {
-      case "static": {
-        switch (parts[4]) {
-          case "over": // 18+
-            onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
-            break;
+      if (settings.loadInfoOnHover)
+        node.addEventListener("mouseover", () => addSuffix(node));
 
-          case "20": // tvdb
-            onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
-            break;
+      const parts = onMouseOver.value.split("/");
+      switch (parts[3]) {
+        case "static": {
+          switch (parts[4]) {
+            case "over": // 18+
+              onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
+              break;
+
+            case "20": // tvdb
+              onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
+              break;
+          }
+
+          break;
         }
 
-        break;
+        case "mimages": // movie
+          onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
+          break;
       }
-
-      case "mimages": // movie
-        onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
-        break;
     }
-  }
-
-  let header;
-  if (document.querySelector("#searchTorrent"))
-    header = document.querySelector("#searchTorrent")?.closest("form");
-  else if (document.querySelector('td[align="center"] > b')?.innerText?.match(/top 100? torrents/i))
-    header = document.querySelector('td[align="center"] > b')?.closest("table");
-
-  if (header) {
-    header.innerHTML = settings.info + header.innerHTML;
-    header.querySelector('input[type="checkbox"]').checked = settings.loadInfoOnHover;
-  } else
-    for (const modification of settings.modifications)
-      if (modification.handler)
-        for (const ref of document.querySelectorAll(modification.ref) || [])
-          modification.handler(ref);
+  });
 
   if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href))
     opened.push(location.href);
