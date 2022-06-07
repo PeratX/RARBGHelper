@@ -137,7 +137,7 @@
   }
 
   for (let element of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
-    const border = element.closest("tr").firstElementChild;
+    const border = element.closest("tr")?.firstElementChild;
 
     if (viewed.includes(element.href)) border.style.borderLeft = "2px solid yellow";
     else viewed.push(element.href);
@@ -175,7 +175,7 @@
   let header;
   if (document.querySelector("#searchTorrent"))
     header = document.querySelector("#searchTorrent")?.closest("form");
-  else if (document.querySelector('td[align="center"] > b')?.innerText?.match(/top 10 torrents/i))
+  else if (document.querySelector('td[align="center"] > b')?.innerText?.match(/top 100? torrents/i))
     header = document.querySelector('td[align="center"] > b')?.closest("table");
 
   if (header) {
