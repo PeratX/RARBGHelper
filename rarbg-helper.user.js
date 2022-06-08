@@ -52,7 +52,6 @@
 
   const settings = {
     downloadImg: '<img src="//dyncdn.me/static/20/img/16x16/download.png" style="height:12px;margin-bottom:-2px;" />',
-    options: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe>&nbsp;<input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;show more options on hover</div>`,
     loadInfoOnHover: (typeof localStorage.getItem("loadInfoOnHover") === 'string' ? !!localStorage.getItem("loadInfoOnHover") : true),
     localStorageMaxEntries: 1000,
     magnetImg: '<img src="//dyncdn.me/static/20/img/magnet.gif" style="height:12px;margin-bottom:-2px;" />',
@@ -96,6 +95,7 @@
         },
       },
     ],
+    options: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe>&nbsp;<input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;show more options on hover</div>`,
   };
 
   let headerNode;
@@ -138,13 +138,14 @@
         .then((res) => {
           const $ = new DOMParser().parseFromString(res, "text/html");
 
+          const imdb = $.querySelector('a[href*="imdb.com/title/"]')?.getAttribute("href");
           const ratingStars = $.querySelector("#ratingstars p")?.innerText || '';
           const ref = $.querySelector("td.lista a[id]");
 
           const downloadLink = ref?.getAttribute("href");
           const magnetLink = ref?.nextElementSibling?.getAttribute("href");
 
-          node.parentNode.innerHTML += (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
+          node.parentNode.innerHTML = node.parentNode.innerHTML.replace(/(imdb: [0-9.\/]+)/i, `<a href="${imdb}" target="_blank">$1</a>`) + (downloadLink ? `<a href="${downloadLink}" target="_blank">${settings.downloadImg}</a>&nbsp;` : '') + (magnetLink ? `<a href="${magnetLink}" target="_blank">${settings.magnetImg}</a>&nbsp;` : '') + ratingStars;
         });
     }
   }
