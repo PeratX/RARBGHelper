@@ -44,7 +44,7 @@
 // @namespace             https://peratx.net
 // @supportURL            https://github.com/PeratX/RARBGHelper
 // @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/rarbg-helper.user.js
-// @version               1.7.5
+// @version               1.7.6
 // ==/UserScript==
 
 (async () => {
@@ -155,12 +155,13 @@
 
   setTimeout(() => {
     for (let node of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
-      const borderNode = node.closest("tr")?.firstElementChild;
+      const borderHighlightNode = node.closest("tr")?.firstElementChild;
+      if (borderHighlightNode) {
+        if (viewed.includes(node.href)) borderHighlightNode.style.borderLeft = "2px solid yellow";
+        else viewed.push(node.href);
 
-      if (viewed.includes(node.href)) borderNode.style.borderLeft = "2px solid yellow";
-      else viewed.push(node.href);
-
-      if (opened.includes(node.href)) borderNode.style.borderLeft = "2px solid red";
+        if (opened.includes(node.href)) borderHighlightNode.style.borderLeft = "2px solid red";
+      }
 
       const onMouseOver = node.attributes.onmouseover;
       if (!onMouseOver) continue;
@@ -189,11 +190,10 @@
           break;
       }
     }
+
+    localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
   });
 
-  if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href))
-    opened.push(location.href);
-
+  if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href)) opened.push(location.href);
   localStorage.setItem("opened", JSON.stringify(opened.slice(~settings.localStorageMaxEntries + 1)));
-  localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
 })();
