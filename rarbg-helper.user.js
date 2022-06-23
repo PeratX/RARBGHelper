@@ -42,9 +42,10 @@
 // @match                 *://rarbgproxy.com/*
 // @match                 *://rarbgunblock.com/*
 // @namespace             https://peratx.net
+// @require               https://cdn.jsdelivr.net/npm/infinite-scroll/dist/infinite-scroll.pkgd.min.js
 // @supportURL            https://github.com/PeratX/RARBGHelper
 // @updateURL             https://raw.githubusercontent.com/PeratX/RARBGHelper/master/rarbg-helper.user.js
-// @version               1.7.5
+// @version               1.7.6
 // ==/UserScript==
 
 (async () => {
@@ -95,14 +96,12 @@
         },
       },
     ],
-    options: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe>&nbsp;<input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;show more options on hover</div>`,
+    options: `<div style="align-items:center;display:flex;flex-direction:row;justify-content:center;">RARBG Helper&nbsp;<iframe src="//ghbtns.com/github-btn.html?user=PeratX&amp;repo=RARBGHelper&amp;type=star&amp;count=true" frameborder="0" style="height:20px;width:120px;"></iframe>&nbsp;<input onchange='javascript:(()=>localStorage.setItem("loadInfoOnHover",this.checked?"1":""))();' type="checkbox" />&nbsp;enable extras on hover</div>`,
   };
 
   let headerNode;
-  if (document.querySelector("#searchTorrent"))
-    headerNode = document.querySelector("#searchTorrent")?.closest("form");
-  else if (document.querySelector('td[align="center"] > b')?.innerText?.match(/top 100? torrents/i))
-    headerNode = document.querySelector('td[align="center"] > b')?.closest("table");
+  if (document.querySelector("#searchTorrent")) headerNode = document.querySelector("#searchTorrent")?.closest("form");
+  else if (document.querySelector('td[align="center"] > b')?.innerText?.match(/top 100? torrents/i)) headerNode = document.querySelector('td[align="center"] > b')?.closest("table");
 
   if (headerNode) {
     headerNode.innerHTML = settings.options + headerNode.innerHTML;
@@ -153,47 +152,61 @@
   const opened = JSON.parse(localStorage.getItem("opened") || "[]");
   const viewed = JSON.parse(localStorage.getItem("viewed") || "[]");
 
-  setTimeout(() => {
-    for (let node of document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]') || []) {
-      const borderNode = node.closest("tr")?.firstElementChild;
-
-      if (viewed.includes(node.href)) borderNode.style.borderLeft = "2px solid yellow";
+  function nodeHandler(node) {
+    const borderHighlightNode = node.closest("tr")?.firstElementChild;
+    if (borderHighlightNode) {
+      if (viewed.includes(node.href)) borderHighlightNode.style.borderLeft = "2px solid yellow";
       else viewed.push(node.href);
 
-      if (opened.includes(node.href)) borderNode.style.borderLeft = "2px solid red";
-
-      const onMouseOver = node.attributes.onmouseover;
-      if (!onMouseOver) continue;
-
-      if (settings.loadInfoOnHover)
-        node.addEventListener("mouseover", () => addSuffix(node));
-
-      const parts = onMouseOver.value.split("/");
-      switch (parts[3]) {
-        case "static": {
-          switch (parts[4]) {
-            case "over": // 18+
-              onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
-              break;
-
-            case "20": // tvdb
-              onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
-              break;
-          }
-
-          break;
-        }
-
-        case "mimages": // movie
-          onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
-          break;
-      }
+      if (opened.includes(node.href)) borderHighlightNode.style.borderLeft = "2px solid red";
     }
+
+    const onMouseOver = node.attributes.onmouseover;
+    if (!onMouseOver) return;
+
+    if (settings.loadInfoOnHover)
+      node.addEventListener("mouseover", () => addSuffix(node));
+
+    const parts = onMouseOver.value.split("/");
+    switch (parts[3]) {
+      case "static":
+        switch (parts[4]) {
+          case "over": // 18+
+            onMouseOver.value = onMouseOver.value.replace("static/over", "posters2/" + parts[5].substr(0, 1));
+            break;
+
+          case "20": // tvdb
+            onMouseOver.value = onMouseOver.value.replace("_small", "_banner_optimized");
+            break;
+        }
+        break;
+
+      case "mimages": // movie
+        onMouseOver.value = onMouseOver.value.replace("over_opt", "poster_opt");
+        break;
+    }
+  }
+
+  setTimeout(() => {
+    document.querySelectorAll('.lista2 > td:nth-child(2) > a[href^="/torrent/"], .lista_related a[href^="/torrent/"]').forEach(i => nodeHandler(i))
+    localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
   });
 
-  if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href))
-    opened.push(location.href);
-
+  if (location.href.match(/https?:\/\/[^\/]*rarbg[^\/]*\.[a-z]{2,4}\/torrent\/[^\/\?]+/) && !opened.includes(location.href)) opened.push(location.href);
   localStorage.setItem("opened", JSON.stringify(opened.slice(~settings.localStorageMaxEntries + 1)));
-  localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
+
+  const infiniteScroll = new InfiniteScroll('.lista2t', {
+    append: '.lista2',
+    // hideNav: '#pager_links',
+    history: false,
+    path: 'a[title="next page"]',
+    // status: '.status',
+  });
+
+  infiniteScroll.on('append', (body, path, nodes, response) => {
+    nodes.forEach(i => nodeHandler(i.querySelector('.lista2 > td:nth-child(2) > a[href^="/torrent/"]')));
+    localStorage.setItem("viewed", JSON.stringify(viewed.slice(~settings.localStorageMaxEntries + 1)));
+  });
+
+  document.querySelectorAll('#pager_links').forEach(i => i.style.display = "none"); // hide pagination
 })();
